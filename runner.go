@@ -61,6 +61,15 @@ func (t *jsonTest) Test(b json.RawMessage) (pass bool) {
 		}
 		return reflect.DeepEqual(tv, v)
 	}
+	if rt.Kind() == reflect.Bool {
+		tv := t.Value.(bool)
+		v := tv
+		err = t.path.Unmarshal(b, &v)
+		if err != nil {
+			return false
+		}
+		return reflect.DeepEqual(tv, v)
+	}
 	return
 }
 

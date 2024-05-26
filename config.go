@@ -48,8 +48,8 @@ func (c configType) RegisterRoutes(r fiber.Router) {
 		if len(t.Route) > 0 {
 			routeMap[t.Route] = append(routeMap[t.Route], t)
 		}
-		r.Get("logs"+t.TaskKey, t.DirBrowser(c.RoutePrefix))
-		r.Static("logs"+t.TaskKey, "logs/"+t.TaskKey, fiber.Static{Browse: true})
+		r.Get("logs/"+t.TaskKey, t.DirBrowser(c.RoutePrefix))
+		r.Static("logs/"+t.TaskKey, "logs/"+t.TaskKey, fiber.Static{Browse: true})
 	}
 	if len(routeMap) > 0 {
 		taskRouter := r.Group("tasks")

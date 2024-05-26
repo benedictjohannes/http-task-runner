@@ -1,0 +1,9 @@
+Listen: :8080
+AppName: HttpTaskExecutioner
+RoutePrefix: api/build
+Tasks:
+  buildBackend:
+    RunnerExecutable: /bin/bash
+    MaxRunSeconds: 600
+    Args:
+      - TASKS/script.sh

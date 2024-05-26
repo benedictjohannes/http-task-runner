@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"reflect"
 	"regexp"
 	"slices"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -16,11 +19,82 @@ import (
 var logEntryDirRegex = regexp.MustCompile(`^\d\d\d\d\d\d.\d\d\d\d\d\d$`)
 var tsLogFormat = "060102.150405"
 
+type jsonTest struct {
+	Key   string `yaml:"Key"`
+	Value any    `yaml:"Value"`
+	path  *json.Path
+}
+
+func (t *jsonTest) Test(b json.RawMessage) (pass bool) {
+	var err error
+	if t.path == nil {
+		t.path, err = json.CreatePath(t.Key)
+		if err != nil {
+			return
+		}
+	}
+	rt := reflect.TypeOf(t.Value)
+	if rt.Kind() == reflect.String {
+		tv := t.Value.(string)
+		v := tv
+		err = t.path.Unmarshal(b, &v)
+		if err != nil {
+			return false
+		}
+		return reflect.DeepEqual(tv, v)
+	}
+	if rt.Kind() >= reflect.Int && rt.Kind() <= reflect.Uint64 {
+		tv := t.Value.(int)
+		v := tv
+		err = t.path.Unmarshal(b, &v)
+		if err != nil {
+			return false
+		}
+		return reflect.DeepEqual(tv, v)
+	}
+	if rt.Kind() >= reflect.Float32 && rt.Kind() <= reflect.Float64 {
+		tv := t.Value.(float64)
+		v := tv
+		err = t.path.Unmarshal(b, &v)
+		if err != nil {
+			return false
+		}
+		return reflect.DeepEqual(tv, v)
+	}
+	return
+}
+
+type tests struct {
+	Header   map[string]string `yaml:"Header"`
+	JSONBody []jsonTest        `yaml:"JSONBody"`
+}
+
+func (t tests) Test(c *fiber.Ctx) (shouldRun bool) {
+	var strValue string
+	for key, value := range t.Header {
+		strValue = c.Get(key)
+		if strValue != value {
+			return
+		}
+	}
+	if len(t.JSONBody) > 0 && strings.HasPrefix(c.Get("Content-Type"), "application/json") {
+		reqBody := c.Body()
+		for _, t := range t.JSONBody {
+			if !t.Test(reqBody) {
+				return
+			}
+		}
+	}
+	return true
+}
+
 type Task struct {
 	RunnerExecutable string   `yaml:"RunnerExecutable"`
 	Args             []string `yaml:"Args"`
 	MaxRunSeconds    int      `yaml:"MaxRunSeconds"`
-	taskKey          string
+	TaskKey          string   `yaml:"TaskKey"`
+	Route            string   `yaml:"Route"`
+	Tests            tests    `yaml:"Tests"`
 	logsDir          string
 	mu               sync.Mutex
 	runningDeadline  *time.Time
@@ -47,13 +121,16 @@ func (t *Task) executeCmd(cmd *exec.Cmd) {
 	t.runningDeadline = nil
 	t.mu.Unlock()
 }
+func (t *Task) ShouldRun(c *fiber.Ctx) (shouldRun bool) {
+	return t.Tests.Test(c)
+}
 func (t *Task) Run() (logPrefix string, err error) {
 	ts, err := t.startTask()
 	if err != nil {
 		return
 	}
 	logPrefix = ts.Format(tsLogFormat)
-	dir := "logs/" + t.taskKey + "/" + logPrefix
+	dir := "logs/" + t.TaskKey + "/" + logPrefix
 	err = os.MkdirAll(dir, 0755)
 	if err != nil {
 		return
@@ -92,7 +169,7 @@ func (t *Task) DirBrowser(routePrefix string) func(c *fiber.Ctx) (err error) {
 					continue
 				}
 				li := fmt.Sprintf("<li><a href=\"%s/%s/logs/%s\">%s</a></li>",
-					usedRoutePrefix, t.taskKey, dir, ts.Format("2006-01-02 15:04:05"),
+					usedRoutePrefix, t.TaskKey, dir, ts.Format("2006-01-02 15:04:05"),
 				)
 				dirs = append(dirs, li)
 			}
@@ -103,8 +180,19 @@ func (t *Task) DirBrowser(routePrefix string) func(c *fiber.Ctx) (err error) {
 		c.Set("Content-Type", "text/html")
 		html := fmt.Sprintf("<html><head><title>%s</title></head>"+
 			"<body><h1>Log entries for %s</h1><ul>%s</ul></body></html>",
-			t.taskKey, t.taskKey, strings.Join(dirs, ""),
+			t.TaskKey, t.TaskKey, strings.Join(dirs, ""),
 		)
 		return c.SendString(html)
 	}
+}
+func (t *Task) Validate() (err error) {
+	if len(t.Tests.JSONBody) > 0 {
+		for _, e := range t.Tests.JSONBody {
+			e.path, err = json.CreatePath(e.Key)
+			if err != nil {
+				return
+			}
+		}
+	}
+	return
 }

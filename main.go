@@ -14,19 +14,19 @@ func main() {
 	configFileName := flag.String("config", "config.yaml", "Configuration file to run")
 	configFile, err := os.Open(*configFileName)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Err opening "+*configFileName+":", err)
 	}
 	configB, err := io.ReadAll(configFile)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Err reading "+*configFileName+":", err)
 	}
 	err = yaml.Unmarshal(configB, &Config)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Err yaml.Unmarshal "+*configFileName+":", err)
 	}
 	err = Config.ValidateConfig()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Err Config.ValidateConfig: ", err)
 	}
 	server := fiber.New(fiber.Config{
 		AppName:      Config.AppName,
@@ -38,5 +38,8 @@ func main() {
 	taskRouter := server.Group(Config.RoutePrefix)
 	Config.RegisterRoutes(taskRouter)
 	server.All("**", func(c *fiber.Ctx) error { return c.SendStatus(404) })
+	for _, r := range server.GetRoutes() {
+		log.Println(r.Method, r.Path, r.Params, r.Name, r.Handlers)
+	}
 	server.Listen(Config.Listen)
 }

@@ -2,8 +2,17 @@ Listen: :8080
 AppName: HttpTaskExecutioner
 RoutePrefix: api/build
 Tasks:
-  buildBackend:
+  - TaskKey: buildBackend # required, unique, must be `0-9a-zA-Z-_.`, used for logs entries
+    Route: repositoryname # Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`
+    Tests: # Optional, must pass all criteria in order to be run
+      Header: # strict string equality test
+        "X-Api-Secret": "secret-value"
+      JSONBody:
+        - key: $.ref
+          value: refs/heads/master
+        - Key: $.repository.url
+          value: https://github.com/my_username/my_repository
     RunnerExecutable: /bin/bash
     MaxRunSeconds: 600
     Args:
-      - TASKS/script.sh
+      - TASKS/buildBackend.sh # relative path to cwd or absolute path

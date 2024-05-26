@@ -38,8 +38,5 @@ func main() {
 	taskRouter := server.Group(Config.RoutePrefix)
 	Config.RegisterRoutes(taskRouter)
 	server.All("**", func(c *fiber.Ctx) error { return c.SendStatus(404) })
-	for _, r := range server.GetRoutes() {
-		log.Println(r.Method, r.Path, r.Params, r.Name, r.Handlers)
-	}
 	server.Listen(Config.Listen)
 }

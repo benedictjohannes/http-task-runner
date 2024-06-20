@@ -166,8 +166,10 @@ func (t *Task) DirBrowser(routePrefix string) func(c *fiber.Ctx) (err error) {
 			return
 		}
 		usedRoutePrefix := routePrefix
-		if !strings.HasSuffix(routePrefix, "/") {
-			usedRoutePrefix = "/" + routePrefix
+		if len(routePrefix) > 0 {
+			if !strings.HasSuffix(routePrefix, "/") {
+				usedRoutePrefix = "/" + routePrefix
+			}
 		}
 		dirs := make([]string, 0, len(files))
 		for _, f := range files {

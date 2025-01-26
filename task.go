@@ -19,13 +19,13 @@ import (
 var logEntryDirRegex = regexp.MustCompile(`^\d\d\d\d\d\d.\d\d\d\d\d\d$`)
 var tsLogFormat = "060102.150405"
 
-type jsonTest struct {
+type jsonBodyTestConditions struct {
 	Key   string `yaml:"Key"`
 	Value any    `yaml:"Value"`
 	path  *json.Path
 }
 
-func (t *jsonTest) Test(b json.RawMessage) (pass bool) {
+func (t *jsonBodyTestConditions) Test(b json.RawMessage) (pass bool) {
 	var err error
 	if t.path == nil {
 		t.path, err = json.CreatePath(t.Key)
@@ -73,12 +73,12 @@ func (t *jsonTest) Test(b json.RawMessage) (pass bool) {
 	return
 }
 
-type tests struct {
+type testConditions struct {
 	Header   map[string]string `yaml:"Header"`
-	JSONBody []jsonTest        `yaml:"JSONBody"`
+	JSONBody []*jsonBodyTestConditions        `yaml:"JSONBody"`
 }
 
-func (t tests) Test(c *fiber.Ctx) (shouldRun bool) {
+func (t testConditions) Test(c *fiber.Ctx) (shouldRun bool) {
 	var strValue string
 	for key, value := range t.Header {
 		strValue = c.Get(key)
@@ -103,7 +103,7 @@ type Task struct {
 	MaxRunSeconds    int      `yaml:"MaxRunSeconds"`
 	TaskKey          string   `yaml:"TaskKey"`
 	Route            string   `yaml:"Route"`
-	Tests            tests    `yaml:"Tests"`
+	Tests            testConditions    `yaml:"Tests"`
 	logsDir          string
 	mu               sync.Mutex
 	runningDeadline  *time.Time

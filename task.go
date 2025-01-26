@@ -180,8 +180,21 @@ func (t *Task) DirBrowser(routePrefix string) func(c *fiber.Ctx) (err error) {
 				if err != nil {
 					continue
 				}
-				li := fmt.Sprintf("<li><a href=\"%s/logs/%s/%s\">%s</a></li>",
+				files, _ := os.ReadDir(dir)
+				var li string
+				if len(files) > 0 {
+					li = ": "
+					for i, f := range files {
+						if i > 0 {
+							li += ", "
+						}
+						li += fmt.Sprintf("<a href=\"%s/logs/%s/%s/%s\">%s</a>",
+							routePrefix, t.TaskKey, dir, f.Name(), f.Name())
+					}
+				}
+				li = fmt.Sprintf("<li><a href=\"%s/logs/%s/%s\">%s</a>%s</li>",
 					routePrefix, t.TaskKey, dir, ts.Format("2006-01-02 15:04:05"),
+					li,
 				)
 				dirs = append(dirs, li)
 			}

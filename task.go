@@ -86,7 +86,10 @@ func (t testConditions) Test(c *fiber.Ctx) (shouldRun bool) {
 			return
 		}
 	}
-	if len(t.JSONBody) > 0 && strings.HasPrefix(c.Get("Content-Type"), "application/json") {
+	if len(t.JSONBody) > 0 {
+		if !strings.HasPrefix(c.Get("Content-Type"), "application/json") {
+			return false
+		}
 		reqBody := c.Body()
 		for _, t := range t.JSONBody {
 			if !t.Test(reqBody) {

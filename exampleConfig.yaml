@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=./appConfig.schema.json
 Listen: :8080
 AppName: HttpTaskExecutioner
 RoutePrefix: api/build
@@ -8,10 +9,10 @@ Tasks:
       Header: # strict string equality test
         "X-Api-Secret": "secret-value"
       JSONBody:
-        - key: $.ref
-          value: refs/heads/master
+        - Key: $.ref
+          Value: refs/heads/master
         - Key: $.repository.url
-          value: https://github.com/my_username/my_repository
+          Value: https://github.com/my_username/my_repository
     RunnerExecutable: /bin/bash
     MaxRunSeconds: 600
     Args:

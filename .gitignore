@@ -2,4 +2,6 @@ TODO**
 TASKS**
 logs**
 config.yaml
+config.*.yaml
+*.config.yaml
 http-task-runner

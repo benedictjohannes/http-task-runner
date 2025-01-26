@@ -5,15 +5,15 @@ RoutePrefix: api/build
 Tasks:
   - TaskKey: buildBackend # Optional, unique, must be `0-9a-zA-Z-_.`, used for logs entries. When not set, the task logging is disabled and does not appear in logs list HTML.
     WebhookRoute: repositoryname # Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`. When not set, the task webhook is disabled.
-    Tests: # Optional, must pass all criteria in order to be run
-      Header: # strict string equality test
+    Tests: # Optional, must pass all criteria for the task to be run
+      Header: # Optional, Strict string equality test for each entries in the Header map
         "X-Api-Secret": "secret-value"
-      JSONBody:
+      JSONBody: # Optional, should always begin each property using $
         - Key: $.ref
           Value: refs/heads/master
         - Key: $.repository.url
           Value: https://github.com/my_username/my_repository
-    RunnerExecutable: /bin/bash
-    MaxRunSeconds: 600
-    Args:
-      - TASKS/buildBackend.sh # relative path to cwd or absolute path
+    MaxRunSeconds: 600 # optional, defaults to 60 seconds
+    RunnerExecutable: /bin/bash # path to the task's executor executable, example: using bash
+    Args: # arguments that will be passed to the task executor
+      - TASKS/buildBackend.sh # a bash script to be ran when task executer is bash

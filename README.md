@@ -28,5 +28,5 @@ This program works by:
 
 Each taskKey (`buildBackend` in the [example config](./exampleConfig.yaml)) would result in these endpoints:
 
--   `{{routePrefix}}/tasks/{{taskKey}}` would trigger the task.
--   `{{routePrefix}}/logs/{{taskKey}}` would list history of task execution (specified as timestamp entries), each should contain `out.log` and `err.log` (stdout and stderr of the task execution).
+-   `{{routePrefix}}/tasks/{{task.WebhookRoute}}` would trigger the task.
+-   `{{routePrefix}}/logs/{{task.TaskKey}}` would render a HTML page listing task execution history (as timestamp entries), where each should contain `out.log` and `err.log` (stdout and stderr of the task execution).

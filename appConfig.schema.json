@@ -19,16 +19,18 @@
             "additionalProperties": false,
             "properties": {
               "Args": {
+                "description": "Arguments that will be passed to the task executor",
                 "items": {
                   "type": "string"
                 },
                 "type": "array"
               },
               "MaxRunSeconds": {
-                "description": "defaults to 60 seconds",
+                "description": "Optional, defaults to 60 seconds",
                 "type": "number"
               },
               "RunnerExecutable": {
+                "description": "Path to the task's executor executable",
                 "type": "string"
               },
               "TaskKey": {
@@ -37,11 +39,14 @@
               },
               "Tests": {
                 "additionalProperties": false,
+                "description": "Optional, must pass all criteria for the task to be run",
                 "properties": {
                   "Header": {
+                    "description": "Optional, strict string equality test for each entries in the Header map",
                     "type": "object"
                   },
                   "JSONBody": {
+                    "description": "Optional, should always begin each property using $",
                     "items": {
                       "additionalProperties": false,
                       "properties": {
@@ -73,9 +78,7 @@
               }
             },
             "required": [
-              "RunnerExecutable",
-              "Args",
-              "Tests"
+              "RunnerExecutable"
             ],
             "type": "object"
           },

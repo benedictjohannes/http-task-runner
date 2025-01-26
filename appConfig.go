@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -44,11 +45,12 @@ func (c configType) ValidateConfig() (err error) {
 }
 func (c configType) RegisterRoutes(r fiber.Router) {
 	routeMap := make(map[string][]*Task)
+	usedRoutePrefix := strings.TrimSuffix(c.RoutePrefix, "/")
 	for _, t := range c.Tasks {
 		if len(t.Route) > 0 {
 			routeMap[t.Route] = append(routeMap[t.Route], t)
 		}
-		r.Get("logs/"+t.TaskKey, t.DirBrowser(c.RoutePrefix))
+		r.Get("logs/"+t.TaskKey, t.DirBrowser(usedRoutePrefix))
 		r.Static("logs/"+t.TaskKey, "logs/"+t.TaskKey, fiber.Static{Browse: true})
 	}
 	if len(routeMap) > 0 {

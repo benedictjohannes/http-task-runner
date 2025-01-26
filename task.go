@@ -168,12 +168,6 @@ func (t *Task) DirBrowser(routePrefix string) func(c *fiber.Ctx) (err error) {
 		if err != nil {
 			return
 		}
-		usedRoutePrefix := routePrefix
-		if len(routePrefix) > 0 {
-			if !strings.HasSuffix(routePrefix, "/") {
-				usedRoutePrefix = "/" + routePrefix
-			}
-		}
 		dirs := make([]string, 0, len(files))
 		for _, f := range files {
 			if f.IsDir() && logEntryDirRegex.MatchString(f.Name()) {
@@ -183,7 +177,7 @@ func (t *Task) DirBrowser(routePrefix string) func(c *fiber.Ctx) (err error) {
 					continue
 				}
 				li := fmt.Sprintf("<li><a href=\"%s/logs/%s/%s\">%s</a></li>",
-					usedRoutePrefix, t.TaskKey, dir, ts.Format("2006-01-02 15:04:05"),
+					routePrefix, t.TaskKey, dir, ts.Format("2006-01-02 15:04:05"),
 				)
 				dirs = append(dirs, li)
 			}

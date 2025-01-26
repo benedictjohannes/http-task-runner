@@ -105,7 +105,7 @@ type Task struct {
 	Args             []string       `yaml:"Args"`
 	MaxRunSeconds    int            `yaml:"MaxRunSeconds"`
 	TaskKey          string         `yaml:"TaskKey"`
-	Route            string         `yaml:"Route"`
+	WebhookRoute     string         `yaml:"WebhookRoute"`
 	Tests            testConditions `yaml:"Tests"`
 	logsDir          string
 	mu               sync.Mutex

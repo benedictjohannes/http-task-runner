@@ -29,8 +29,8 @@ func (c configType) ValidateConfig() (err error) {
 		if err != nil {
 			return fmt.Errorf("runner executable for taskKey %s (%s) is not found", task.TaskKey, task.RunnerExecutable)
 		}
-		if len(task.Route) > 0 && !allowedTaskKeyRegex.MatchString(task.Route) {
-			return fmt.Errorf("illegal character for a task Route: %s", task.Route)
+		if len(task.WebhookRoute) > 0 && !allowedTaskKeyRegex.MatchString(task.WebhookRoute) {
+			return fmt.Errorf("illegal character for a task Route: %s", task.WebhookRoute)
 		}
 		task.logsDir = "logs/" + task.TaskKey
 		err = os.MkdirAll(task.logsDir, 0755)
@@ -47,8 +47,8 @@ func (c configType) RegisterRoutes(r fiber.Router) {
 	routeMap := make(map[string][]*Task)
 	usedRoutePrefix := strings.TrimSuffix(c.RoutePrefix, "/")
 	for _, t := range c.Tasks {
-		if len(t.Route) > 0 {
-			routeMap[t.Route] = append(routeMap[t.Route], t)
+		if len(t.WebhookRoute) > 0 {
+			routeMap[t.WebhookRoute] = append(routeMap[t.WebhookRoute], t)
 		}
 		r.Get("logs/"+t.TaskKey, t.DirBrowser(usedRoutePrefix))
 		r.Static("logs/"+t.TaskKey, "logs/"+t.TaskKey, fiber.Static{Browse: true})

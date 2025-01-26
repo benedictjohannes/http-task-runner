@@ -12,7 +12,7 @@ type Task = {
     /** defaults to 60 seconds */
     MaxRunSeconds?: number
     TaskKey: string
-    Route: string
+    WebhookRoute: string
     Tests: TestConditions
 }
 export type ConfigSchema = {

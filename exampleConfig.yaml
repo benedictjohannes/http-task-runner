@@ -4,7 +4,7 @@ AppName: HttpTaskExecutioner
 RoutePrefix: api/build
 Tasks:
   - TaskKey: buildBackend # required, unique, must be `0-9a-zA-Z-_.`, used for logs entries
-    Route: repositoryname # Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`
+    WebhookRoute: repositoryname # Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`
     Tests: # Optional, must pass all criteria in order to be run
       Header: # strict string equality test
         "X-Api-Secret": "secret-value"

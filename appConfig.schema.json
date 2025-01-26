@@ -28,9 +28,6 @@
                 "description": "defaults to 60 seconds",
                 "type": "number"
               },
-              "Route": {
-                "type": "string"
-              },
               "RunnerExecutable": {
                 "type": "string"
               },
@@ -68,13 +65,16 @@
                   }
                 },
                 "type": "object"
+              },
+              "WebhookRoute": {
+                "type": "string"
               }
             },
             "required": [
               "RunnerExecutable",
               "Args",
               "TaskKey",
-              "Route",
+              "WebhookRoute",
               "Tests"
             ],
             "type": "object"

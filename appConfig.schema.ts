@@ -11,7 +11,7 @@ type TestConditions = {
 type Task = {
     /** Optional, unique, must be `0-9a-zA-Z-_.`, used for logs entries. When not set, the task logging is disabled and does not appear in logs list HTML. */
     TaskKey?: string
-    /** Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`. When not set, the task webhook is disabled. */
+    /** Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`. When not set, the task webhook is directly to the tasks root endpoint. */
     WebhookRoute?: string
     /** Path to the task's executor executable */
     RunnerExecutable: string

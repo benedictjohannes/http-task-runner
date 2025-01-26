@@ -73,7 +73,7 @@
                 "type": "object"
               },
               "WebhookRoute": {
-                "description": "Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`. When not set, the task webhook is disabled.",
+                "description": "Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`. When not set, the task webhook is directly to the tasks root endpoint.",
                 "type": "string"
               }
             },

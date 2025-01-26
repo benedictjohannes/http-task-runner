@@ -46,11 +46,9 @@ func (c configType) ValidateConfig() (err error) {
 func (c configType) RegisterRoutes(r fiber.Router) {
 	routeMap := make(map[string][]*Task)
 	var logListPageHtml string
-	usedRoutePrefix := "/" + strings.TrimPrefix(strings.TrimSuffix(c.RoutePrefix, "/"),"/")
+	usedRoutePrefix := "/" + strings.TrimPrefix(strings.TrimSuffix(c.RoutePrefix, "/"), "/")
 	for _, t := range c.Tasks {
-		if len(t.WebhookRoute) > 0 {
-			routeMap[t.WebhookRoute] = append(routeMap[t.WebhookRoute], t)
-		}
+		routeMap[t.WebhookRoute] = append(routeMap[t.WebhookRoute], t)
 		if len(t.TaskKey) > 0 {
 			r.Get("logs/"+t.TaskKey, t.DirBrowser(usedRoutePrefix))
 			r.Static("logs/"+t.TaskKey, "logs/"+t.TaskKey, fiber.Static{Browse: true})

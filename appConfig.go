@@ -22,14 +22,14 @@ var allowedTaskKeyRegex = regexp.MustCompile(`^[0-9a-zAA-Z-_\.]+$`)
 func (c configType) ValidateConfig() (err error) {
 	for _, task := range c.Tasks {
 		if !allowedTaskKeyRegex.MatchString(task.TaskKey) {
-			return fmt.Errorf("illegal character for a taskKey: %s" + task.TaskKey)
+			return fmt.Errorf("illegal character for a taskKey: %s", task.TaskKey)
 		}
 		_, err = os.Stat(task.RunnerExecutable)
 		if err != nil {
 			return fmt.Errorf("runner executable for taskKey %s (%s) is not found", task.TaskKey, task.RunnerExecutable)
 		}
 		if len(task.Route) > 0 && !allowedTaskKeyRegex.MatchString(task.Route) {
-			return fmt.Errorf("illegal character for a task Route: %s" + task.Route)
+			return fmt.Errorf("illegal character for a task Route: %s", task.Route)
 		}
 		task.logsDir = "logs/" + task.TaskKey
 		err = os.MkdirAll(task.logsDir, 0755)

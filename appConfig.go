@@ -45,6 +45,7 @@ func (c configType) ValidateConfig() (err error) {
 }
 func (c configType) RegisterRoutes(r fiber.Router) {
 	routeMap := make(map[string][]*Task)
+	var logListPageHtml string
 	usedRoutePrefix := strings.TrimSuffix(c.RoutePrefix, "/")
 	for _, t := range c.Tasks {
 		if len(t.WebhookRoute) > 0 {
@@ -52,7 +53,18 @@ func (c configType) RegisterRoutes(r fiber.Router) {
 		}
 		r.Get("logs/"+t.TaskKey, t.DirBrowser(usedRoutePrefix))
 		r.Static("logs/"+t.TaskKey, "logs/"+t.TaskKey, fiber.Static{Browse: true})
+		logListPageHtml += fmt.Sprintf("<li><a href=\"%s/logs/%s\">%s</a></li>",
+			usedRoutePrefix, t.TaskKey, t.TaskKey,
+		)
 	}
+	logListPageHtml = fmt.Sprintf("<html><head><title>%s | Tasks</title></head>"+
+		"<body><h1>Tasks of %s:</h1><ul>%s</ul></body></html>",
+		c.AppName, c.AppName, logListPageHtml,
+	)
+	r.Get("/logs", func(ctx *fiber.Ctx) (err error) {
+		ctx.Set("Content-Type", "text/html")
+		return ctx.SendString(logListPageHtml)
+	})
 	if len(routeMap) > 0 {
 		taskRouter := r.Group("tasks")
 		for r, tr := range routeMap {

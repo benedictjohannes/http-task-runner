@@ -74,8 +74,8 @@ func (t *jsonBodyTestConditions) Test(b json.RawMessage) (pass bool) {
 }
 
 type testConditions struct {
-	Header   map[string]string `yaml:"Header"`
-	JSONBody []*jsonBodyTestConditions        `yaml:"JSONBody"`
+	Header   map[string]string         `yaml:"Header"`
+	JSONBody []*jsonBodyTestConditions `yaml:"JSONBody"`
 }
 
 func (t testConditions) Test(c *fiber.Ctx) (shouldRun bool) {
@@ -101,12 +101,12 @@ func (t testConditions) Test(c *fiber.Ctx) (shouldRun bool) {
 }
 
 type Task struct {
-	RunnerExecutable string   `yaml:"RunnerExecutable"`
-	Args             []string `yaml:"Args"`
-	MaxRunSeconds    int      `yaml:"MaxRunSeconds"`
-	TaskKey          string   `yaml:"TaskKey"`
-	Route            string   `yaml:"Route"`
-	Tests            testConditions    `yaml:"Tests"`
+	RunnerExecutable string         `yaml:"RunnerExecutable"`
+	Args             []string       `yaml:"Args"`
+	MaxRunSeconds    int            `yaml:"MaxRunSeconds"`
+	TaskKey          string         `yaml:"TaskKey"`
+	Route            string         `yaml:"Route"`
+	Tests            testConditions `yaml:"Tests"`
 	logsDir          string
 	mu               sync.Mutex
 	runningDeadline  *time.Time

@@ -180,7 +180,7 @@ func (t *Task) DirBrowser(routePrefix string) func(c *fiber.Ctx) (err error) {
 				if err != nil {
 					continue
 				}
-				files, _ := os.ReadDir(dir)
+				files, _ := os.ReadDir(t.logsDir + "/" + dir)
 				var li string
 				if len(files) > 0 {
 					li = ": "

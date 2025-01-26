@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "config:generateSchema": "npx ts-json-schema-generator --path ./appConfig.schema.ts --type ConfigSchema > ./appConfig.schema.json"
+    }
+}

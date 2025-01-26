@@ -1,0 +1,94 @@
+{
+  "$ref": "#/definitions/ConfigSchema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ConfigSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "AppName": {
+          "type": "string"
+        },
+        "Listen": {
+          "type": "string"
+        },
+        "RoutePrefix": {
+          "type": "string"
+        },
+        "Tasks": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "Args": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "MaxRunSeconds": {
+                "description": "defaults to 60 seconds",
+                "type": "number"
+              },
+              "Route": {
+                "type": "string"
+              },
+              "RunnerExecutable": {
+                "type": "string"
+              },
+              "TaskKey": {
+                "type": "string"
+              },
+              "Tests": {
+                "additionalProperties": false,
+                "properties": {
+                  "Header": {
+                    "type": "object"
+                  },
+                  "JSONBody": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "Key": {
+                          "type": "string"
+                        },
+                        "Value": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "Key",
+                        "Value"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "required": [
+              "RunnerExecutable",
+              "Args",
+              "TaskKey",
+              "Route",
+              "Tests"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Listen",
+        "AppName",
+        "RoutePrefix",
+        "Tasks"
+      ],
+      "type": "object"
+    }
+  }
+}

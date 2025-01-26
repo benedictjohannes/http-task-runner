@@ -141,23 +141,27 @@ func (t *Task) Run() (logPrefix string, err error) {
 	if err != nil {
 		return
 	}
-	logPrefix = ts.Format(tsLogFormat)
-	dir := "logs/" + t.TaskKey + "/" + logPrefix
-	err = os.MkdirAll(dir, 0755)
-	if err != nil {
-		return
-	}
-	outFile, err := os.OpenFile(dir+"/out.log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		return
-	}
-	errFile, err := os.OpenFile(dir+"/err.log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		return
-	}
 	cmd := exec.Command(t.RunnerExecutable, t.Args...)
-	cmd.Stdout = outFile
-	cmd.Stderr = errFile
+	if len(t.TaskKey) > 0 {
+
+		logPrefix = ts.Format(tsLogFormat)
+		dir := "logs/" + t.TaskKey + "/" + logPrefix
+		err = os.MkdirAll(dir, 0755)
+		if err != nil {
+			return
+		}
+		var outFile, errFile *os.File
+		outFile, err = os.OpenFile(dir+"/out.log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			return
+		}
+		errFile, err = os.OpenFile(dir+"/err.log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			return
+		}
+		cmd.Stdout = outFile
+		cmd.Stderr = errFile
+	}
 	cmd.WaitDelay = time.Second * time.Duration(t.MaxRunSeconds)
 	go t.executeCmd(cmd)
 	return

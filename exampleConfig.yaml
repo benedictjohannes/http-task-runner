@@ -3,8 +3,8 @@ Listen: :8080
 AppName: HttpTaskExecutioner
 RoutePrefix: api/build
 Tasks:
-  - TaskKey: buildBackend # required, unique, must be `0-9a-zA-Z-_.`, used for logs entries
-    WebhookRoute: repositoryname # Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`
+  - TaskKey: buildBackend # Optional, unique, must be `0-9a-zA-Z-_.`, used for logs entries. When not set, the task logging is disabled and does not appear in logs list HTML.
+    WebhookRoute: repositoryname # Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`. When not set, the task webhook is disabled.
     Tests: # Optional, must pass all criteria in order to be run
       Header: # strict string equality test
         "X-Api-Secret": "secret-value"

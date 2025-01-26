@@ -32,6 +32,7 @@
                 "type": "string"
               },
               "TaskKey": {
+                "description": "Optional, unique, must be `0-9a-zA-Z-_.`, used for logs entries. When not set, the task logging is disabled and does not appear in logs list HTML.",
                 "type": "string"
               },
               "Tests": {
@@ -67,14 +68,13 @@
                 "type": "object"
               },
               "WebhookRoute": {
+                "description": "Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`. When not set, the task webhook is disabled.",
                 "type": "string"
               }
             },
             "required": [
               "RunnerExecutable",
               "Args",
-              "TaskKey",
-              "WebhookRoute",
               "Tests"
             ],
             "type": "object"

@@ -51,11 +51,13 @@ func (c configType) RegisterRoutes(r fiber.Router) {
 		if len(t.WebhookRoute) > 0 {
 			routeMap[t.WebhookRoute] = append(routeMap[t.WebhookRoute], t)
 		}
-		r.Get("logs/"+t.TaskKey, t.DirBrowser(usedRoutePrefix))
-		r.Static("logs/"+t.TaskKey, "logs/"+t.TaskKey, fiber.Static{Browse: true})
-		logListPageHtml += fmt.Sprintf("<li><a href=\"%s/logs/%s\">%s</a></li>",
-			usedRoutePrefix, t.TaskKey, t.TaskKey,
-		)
+		if len(t.TaskKey) > 0 {
+			r.Get("logs/"+t.TaskKey, t.DirBrowser(usedRoutePrefix))
+			r.Static("logs/"+t.TaskKey, "logs/"+t.TaskKey, fiber.Static{Browse: true})
+			logListPageHtml += fmt.Sprintf("<li><a href=\"%s/logs/%s\">%s</a></li>",
+				usedRoutePrefix, t.TaskKey, t.TaskKey,
+			)
+		}
 	}
 	logListPageHtml = fmt.Sprintf("<html><head><title>%s | Tasks</title></head>"+
 		"<body><h1>Tasks of %s:</h1><ul>%s</ul></body></html>",

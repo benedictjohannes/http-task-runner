@@ -197,7 +197,7 @@ func (t *Task) DirBrowser(routePrefix string) func(c *fiber.Ctx) (err error) {
 					}
 				}
 				li = fmt.Sprintf("<li><a href=\"%s/logs/%s/%s\">%s</a>%s</li>",
-					routePrefix, t.TaskKey, dir, ts.Format("2006-01-02 15:04:05"),
+					linkPrefix, t.TaskKey, dir, ts.Format("2006-01-02 15:04:05"),
 					li,
 				)
 				dirs = append(dirs, li)

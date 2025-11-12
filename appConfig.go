@@ -47,13 +47,17 @@ func (c configType) RegisterRoutes(r fiber.Router) {
 	routeMap := make(map[string][]*Task)
 	var logListPageHtml string
 	usedRoutePrefix := "/" + strings.TrimPrefix(strings.TrimSuffix(c.RoutePrefix, "/"), "/")
+	linkPrefix := ""
+	if len(usedRoutePrefix) > 1 {
+		linkPrefix = usedRoutePrefix
+	}
 	for _, t := range c.Tasks {
 		routeMap[t.WebhookRoute] = append(routeMap[t.WebhookRoute], t)
 		if len(t.TaskKey) > 0 {
 			r.Get("logs/"+t.TaskKey, t.DirBrowser(usedRoutePrefix))
 			r.Static("logs/"+t.TaskKey, "logs/"+t.TaskKey, fiber.Static{Browse: true})
 			logListPageHtml += fmt.Sprintf("<li><a href=\"%s/logs/%s\">%s</a></li>",
-				usedRoutePrefix, t.TaskKey, t.TaskKey,
+				linkPrefix, t.TaskKey, t.TaskKey,
 			)
 		}
 	}

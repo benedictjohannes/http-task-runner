@@ -167,6 +167,10 @@ func (t *Task) Run() (logPrefix string, err error) {
 	return
 }
 func (t *Task) DirBrowser(routePrefix string) func(c *fiber.Ctx) (err error) {
+	linkPrefix := routePrefix
+	if len(routePrefix) == 1 {
+		linkPrefix = ""
+	}
 	return func(c *fiber.Ctx) (err error) {
 		files, err := os.ReadDir(t.logsDir)
 		if err != nil {
@@ -189,7 +193,7 @@ func (t *Task) DirBrowser(routePrefix string) func(c *fiber.Ctx) (err error) {
 							li += ", "
 						}
 						li += fmt.Sprintf("<a href=\"%s/logs/%s/%s/%s\">%s</a>",
-							routePrefix, t.TaskKey, dir, f.Name(), f.Name())
+							linkPrefix, t.TaskKey, dir, f.Name(), f.Name())
 					}
 				}
 				li = fmt.Sprintf("<li><a href=\"%s/logs/%s/%s\">%s</a>%s</li>",

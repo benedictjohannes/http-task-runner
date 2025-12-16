@@ -32,6 +32,9 @@ func (c configType) ValidateConfig() (err error) {
 		if len(task.WebhookRoute) > 0 && !allowedTaskKeyRegex.MatchString(task.WebhookRoute) {
 			return fmt.Errorf("illegal character for a task Route: %s", task.WebhookRoute)
 		}
+		if len(task.WebhookRoute) == 0 {
+			task.WebhookRoute = task.TaskKey
+		}
 		task.logsDir = "logs/" + task.TaskKey
 		err = os.MkdirAll(task.logsDir, 0755)
 		if err != nil {

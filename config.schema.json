@@ -1,0 +1,106 @@
+{
+  "$ref": "#/definitions/ConfigSchema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ConfigSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "AppName": {
+          "type": "string"
+        },
+        "Listen": {
+          "type": "string"
+        },
+        "RoutePrefix": {
+          "description": "HTTP route prefix on which to mount the app",
+          "type": "string"
+        },
+        "SeparateRunLogs": {
+          "description": "when true, stdout and stderr are written to out.log and err.log. Otherwise, they will be combined into run.log",
+          "type": "boolean"
+        },
+        "Tasks": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "Args": {
+                "description": "Arguments that will be passed to the task executor",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "MaxRunSeconds": {
+                "description": "Optional, defaults to 60 seconds",
+                "type": "number"
+              },
+              "RunnerExecutable": {
+                "description": "Path to the task's executor executable",
+                "type": "string"
+              },
+              "TaskKey": {
+                "description": "Optional, unique, must be `0-9a-zA-Z-_.`, used for logs entries. When not set, the task logging is disabled and does not appear in logs list HTML.",
+                "type": "string"
+              },
+              "Tests": {
+                "additionalProperties": false,
+                "description": "Optional, must pass all criteria for the task to be run",
+                "properties": {
+                  "Header": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Optional, strict string equality test for each entries in the Header map",
+                    "type": "object"
+                  },
+                  "JSONBody": {
+                    "description": "Optional, should always begin each property using $",
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "Key": {
+                          "type": "string"
+                        },
+                        "Value": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "Key",
+                        "Value"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "WebhookRoute": {
+                "description": "Optional, must be `0-9a-zA-Z-_.`, registers the route `{{RoutePrefix}}/tasks/{{Route}}`. When not set, the task webhook is directly to the tasks root endpoint.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "RunnerExecutable"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Listen",
+        "AppName",
+        "RoutePrefix",
+        "Tasks"
+      ],
+      "type": "object"
+    }
+  }
+}
+

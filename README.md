@@ -14,7 +14,7 @@ This aims to provide exactly that.
 
 # How does it work?
 
-The [example configuration](./exampleConfig.yaml) can serve as starting point to define a YAML of the configuration. By default, the program would look for `config.yaml` in the working directory (that can be overriden using `--config` option).
+The [example configuration](./exampleConfig.yaml) can serve as starting point to define a YAML of the configuration. By default, the program would look for `config.yaml` in the working directory (that can be overriden using `--config` option). To auto reload the program when the configuration file change, use the `--watch` flag.
 
 This program works by:
 
@@ -29,4 +29,4 @@ This program works by:
 Each taskKey (`buildBackend` in the [example config](./exampleConfig.yaml)) would result in these endpoints:
 
 -   `{{routePrefix}}/tasks/{{task.WebhookRoute}}` would trigger the task.
--   `{{routePrefix}}/logs/{{task.TaskKey}}` would render a HTML page listing task execution history (as timestamp entries), where each should contain `out.log` and `err.log` (stdout and stderr of the task execution).
+-   `{{routePrefix}}/logs/{{task.TaskKey}}` would render a HTML page listing task execution history (as timestamp entries), where each should contain the task executions logs that default to `run.log` if `SeparateRunLogs` is false in the configuration, or `out.log` _(stdout)_ and `err.log` _(stderr)_ of the task execution.

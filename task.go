@@ -124,11 +124,12 @@ func (t *Task) startTask() (ts time.Time, err error) {
 	t.mu.Unlock()
 	return
 }
-func (t *Task) executeCmd(cmd *exec.Cmd) {
+func (t *Task) executeCmd(cmd *exec.Cmd, closeOutFiles func()) {
 	err := cmd.Run()
 	if err != nil {
 		cmd.Stderr.Write([]byte("\n" + err.Error()))
 	}
+	closeOutFiles()
 	t.mu.Lock()
 	t.runningDeadline = nil
 	t.mu.Unlock()
@@ -136,34 +137,50 @@ func (t *Task) executeCmd(cmd *exec.Cmd) {
 func (t *Task) ShouldRun(c *fiber.Ctx) (shouldRun bool) {
 	return t.Tests.Test(c)
 }
-func (t *Task) Run() (logPrefix string, err error) {
+func (t *Task) Run(combineLogs bool) (logPrefix string, err error) {
 	ts, err := t.startTask()
 	if err != nil {
 		return
 	}
 	cmd := exec.Command(t.RunnerExecutable, t.Args...)
+	var outFiles []*os.File
 	if len(t.TaskKey) > 0 {
-
 		logPrefix = ts.Format(tsLogFormat)
 		dir := "logs/" + t.TaskKey + "/" + logPrefix
 		err = os.MkdirAll(dir, 0755)
 		if err != nil {
 			return
 		}
-		var outFile, errFile *os.File
-		outFile, err = os.OpenFile(dir+"/out.log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-		if err != nil {
-			return
+		var outFile *os.File
+		var outFileName = dir + "/out.log"
+		if combineLogs {
+			outFileName = dir + "/run.log"
 		}
-		errFile, err = os.OpenFile(dir+"/err.log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+		outFile, err = os.OpenFile(outFileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			return
 		}
 		cmd.Stdout = outFile
-		cmd.Stderr = errFile
+		outFiles = append(outFiles, outFile)
+		if combineLogs {
+			cmd.Stderr = outFile
+		} else {
+			var errFile *os.File
+			errFile, err = os.OpenFile(dir+"/err.log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+			if err != nil {
+				return
+			}
+			cmd.Stderr = errFile
+			outFiles = append(outFiles, errFile)
+		}
 	}
 	cmd.WaitDelay = time.Second * time.Duration(t.MaxRunSeconds)
-	go t.executeCmd(cmd)
+	closeOutFiles := func() {
+		for _, f := range outFiles {
+			f.Close()
+		}
+	}
+	go t.executeCmd(cmd, closeOutFiles)
 	return
 }
 func (t *Task) DirBrowser(routePrefix string) func(c *fiber.Ctx) (err error) {

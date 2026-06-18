@@ -4,7 +4,7 @@ type JSONContentTest = {
 }
 type TestConditions = {
     /** Optional, strict string equality test for each entries in the Header map */
-    Header?: Record<string, any>
+    Header?: Record<string, string>
     /** Optional, should always begin each property using $ */
     JSONBody?: JSONContentTest[]
 }
@@ -25,6 +25,9 @@ type Task = {
 export type ConfigSchema = {
     Listen: string
     AppName: string
+    /** HTTP route prefix on which to mount the app */
     RoutePrefix: string
+    /** when true, stdout and stderr are written to out.log and err.log. Otherwise, they will be combined into run.log */
+    SeparateRunLogs?: boolean
     Tasks: Task[]
 }

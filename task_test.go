@@ -234,7 +234,7 @@ func TestTask_ConcurrencyAndExecution(t *testing.T) {
 	}
 
 	// 1. Start task
-	logPrefix, err := task.Run()
+	logPrefix, err := task.Run(false)
 	if err != nil {
 		t.Fatalf("expected task to run successfully: %v", err)
 	}
@@ -243,7 +243,7 @@ func TestTask_ConcurrencyAndExecution(t *testing.T) {
 	}
 
 	// 2. Start again immediately (should fail due to concurrency control)
-	_, err = task.Run()
+	_, err = task.Run(false)
 	if err == nil {
 		t.Error("expected error when running task concurrently, got nil")
 	} else if !strings.Contains(err.Error(), "still running") {
@@ -259,7 +259,7 @@ func TestTask_ConcurrencyAndExecution(t *testing.T) {
 	task.RunnerExecutable = echoPath
 	task.Args = []string{"hello-from-test"}
 	
-	logPrefix2, err := task.Run()
+	logPrefix2, err := task.Run(false)
 	if err != nil {
 		t.Fatalf("expected task to run successfully: %v", err)
 	}
@@ -276,3 +276,48 @@ func TestTask_ConcurrencyAndExecution(t *testing.T) {
 		t.Errorf("expected out.log to contain 'hello-from-test', got: %q", string(outContent))
 	}
 }
+
+func TestTask_CombineLogs(t *testing.T) {
+	echoPath, errEcho := exec.LookPath("echo")
+	if errEcho != nil {
+		t.Skip("Skip test: echo binary not found on this system")
+	}
+
+	taskKey := "testcombinelogstask"
+	logsDir := "logs/" + taskKey
+	defer os.RemoveAll(logsDir)
+
+	task := &Task{
+		RunnerExecutable: echoPath,
+		Args:             []string{"hello-combined"},
+		MaxRunSeconds:    5,
+		TaskKey:          taskKey,
+		logsDir:          logsDir,
+	}
+
+	logPrefix, err := task.Run(true)
+	if err != nil {
+		t.Fatalf("expected task to run successfully: %v", err)
+	}
+
+	// Wait for background cmd.Run/executeCmd execution to complete
+	time.Sleep(300 * time.Millisecond)
+
+	runPath := filepath.Join(logsDir, logPrefix, "run.log")
+	runContent, err := os.ReadFile(runPath)
+	if err != nil {
+		t.Fatalf("expected to read run log file at %s: %v", runPath, err)
+	}
+	if !strings.Contains(string(runContent), "hello-combined") {
+		t.Errorf("expected run.log to contain 'hello-combined', got: %q", string(runContent))
+	}
+
+	// Ensure out.log and err.log do not exist
+	if _, err := os.Stat(filepath.Join(logsDir, logPrefix, "out.log")); !os.IsNotExist(err) {
+		t.Error("expected out.log to not exist when combineLogs is true")
+	}
+	if _, err := os.Stat(filepath.Join(logsDir, logPrefix, "err.log")); !os.IsNotExist(err) {
+		t.Error("expected err.log to not exist when combineLogs is true")
+	}
+}
+

@@ -12,7 +12,12 @@
           "type": "string"
         },
         "RoutePrefix": {
+          "description": "HTTP route prefix on which to mount the app",
           "type": "string"
+        },
+        "SeparateRunLogs": {
+          "description": "when true, stdout and stderr are written to out.log and err.log. Otherwise, they will be combined into run.log",
+          "type": "boolean"
         },
         "Tasks": {
           "items": {
@@ -42,6 +47,9 @@
                 "description": "Optional, must pass all criteria for the task to be run",
                 "properties": {
                   "Header": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
                     "description": "Optional, strict string equality test for each entries in the Header map",
                     "type": "object"
                   },
@@ -95,3 +103,4 @@
     }
   }
 }
+

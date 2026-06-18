@@ -10,10 +10,11 @@ import (
 )
 
 type configType struct {
-	Listen      string  `yaml:"Listen"`
-	AppName     string  `yaml:"AppName"`
-	RoutePrefix string  `yaml:"RoutePrefix"`
-	Tasks       []*Task `yaml:"Tasks"`
+	Listen          string  `yaml:"Listen"`
+	AppName         string  `yaml:"AppName"`
+	RoutePrefix     string  `yaml:"RoutePrefix"`
+	SeparateRunLogs bool    `yaml:"SeparateRunLogs"`
+	Tasks           []*Task `yaml:"Tasks"`
 }
 
 var Config configType
@@ -75,13 +76,13 @@ func (c configType) RegisterRoutes(r fiber.Router) {
 	if len(routeMap) > 0 {
 		taskRouter := r.Group("tasks")
 		for r, tr := range routeMap {
-			fn := func(c *fiber.Ctx) error {
+			fn := func(ctx *fiber.Ctx) error {
 				for _, t := range tr {
-					if t.ShouldRun(c) {
-						t.Run()
+					if t.ShouldRun(ctx) {
+						t.Run(!c.SeparateRunLogs)
 					}
 				}
-				return c.SendStatus(fiber.StatusOK)
+				return ctx.SendStatus(fiber.StatusOK)
 			}
 			taskRouter.Get(r, fn)
 			taskRouter.Post(r, fn)

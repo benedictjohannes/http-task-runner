@@ -12,6 +12,7 @@ import (
 
 func main() {
 	configFileName := flag.String("config", "config.yaml", "Configuration file to run")
+	flag.Parse()
 	configFile, err := os.Open(*configFileName)
 	if err != nil {
 		log.Fatalln("Err opening "+*configFileName+":", err)

@@ -1,9 +1,10 @@
 module http-task-runner
 
-go 1.22.1
+go 1.23
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/gofiber/fiber/v2 v2.52.4 // indirect
 	github.com/google/uuid v1.5.0 // indirect

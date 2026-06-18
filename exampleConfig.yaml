@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=./appConfig.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/benedictjohannes/http-task-runner/refs/heads/master/config.schema.json
 Listen: :8080
 AppName: HttpTaskExecutioner
 RoutePrefix: api/build

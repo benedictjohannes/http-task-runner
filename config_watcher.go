@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"gopkg.in/yaml.v3"
+	"github.com/goccy/go-yaml"
 )
 
 func startWatcher(configPath string, reloadChan chan configType) {

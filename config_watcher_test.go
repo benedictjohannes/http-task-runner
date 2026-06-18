@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/goccy/go-yaml"
 	"github.com/gofiber/fiber/v2"
-	"gopkg.in/yaml.v3"
 )
 
 func TestWatchAndReload(t *testing.T) {

@@ -21,7 +21,7 @@ var Config configType
 
 var allowedTaskKeyRegex = regexp.MustCompile(`^[0-9a-zAA-Z-_\.]+$`)
 
-func (c configType) ValidateConfig() (err error) {
+func (c *configType) ValidateConfig() (err error) {
 	for _, task := range c.Tasks {
 		if !allowedTaskKeyRegex.MatchString(task.TaskKey) {
 			return fmt.Errorf("illegal character for a taskKey: %s", task.TaskKey)
@@ -47,8 +47,9 @@ func (c configType) ValidateConfig() (err error) {
 	}
 	return
 }
-func (c configType) RegisterRoutes(r fiber.Router) {
-	routeMap := make(map[string][]*Task)
+func (c *configType) RegisterRoutes(router fiber.Router) {
+	webhookRouteMap := make(map[string][]*Task)
+	logRouteMap := make(map[string]bool)
 	var logListPageHtml string
 	usedRoutePrefix := "/" + strings.TrimPrefix(strings.TrimSuffix(c.RoutePrefix, "/"), "/")
 	linkPrefix := ""
@@ -56,36 +57,37 @@ func (c configType) RegisterRoutes(r fiber.Router) {
 		linkPrefix = usedRoutePrefix
 	}
 	for _, t := range c.Tasks {
-		routeMap[t.WebhookRoute] = append(routeMap[t.WebhookRoute], t)
-		if len(t.TaskKey) > 0 {
-			r.Get("logs/"+t.TaskKey, t.DirBrowser(usedRoutePrefix))
-			r.Static("logs/"+t.TaskKey, "logs/"+t.TaskKey, fiber.Static{Browse: true})
+		webhookRouteMap[t.WebhookRoute] = append(webhookRouteMap[t.WebhookRoute], t)
+		if len(t.TaskKey) > 0 && !logRouteMap[t.TaskKey] {
+			router.Get("logs/"+t.TaskKey, t.DirBrowser(usedRoutePrefix))
+			router.Static("logs/"+t.TaskKey, "logs/"+t.TaskKey, fiber.Static{Browse: true})
 			logListPageHtml += fmt.Sprintf("<li><a href=\"%s/logs/%s\">%s</a></li>",
 				linkPrefix, t.TaskKey, t.TaskKey,
 			)
+			logRouteMap[t.TaskKey] = true
 		}
 	}
 	logListPageHtml = fmt.Sprintf("<html><head><title>%s | Tasks</title></head>"+
 		"<body><h1>Tasks of %s:</h1><ul>%s</ul></body></html>",
 		c.AppName, c.AppName, logListPageHtml,
 	)
-	r.Get("/logs", func(ctx *fiber.Ctx) (err error) {
+	router.Get("/logs", func(ctx *fiber.Ctx) (err error) {
 		ctx.Set("Content-Type", "text/html")
 		return ctx.SendString(logListPageHtml)
 	})
-	if len(routeMap) > 0 {
-		taskRouter := r.Group("tasks")
-		for r, tr := range routeMap {
+	if len(webhookRouteMap) > 0 {
+		taskRouter := router.Group("tasks")
+		for subroute, subrouteTasks := range webhookRouteMap {
 			fn := func(ctx *fiber.Ctx) error {
-				for _, t := range tr {
+				for _, t := range subrouteTasks {
 					if t.ShouldRun(ctx) {
 						t.Run(!c.SeparateRunLogs)
 					}
 				}
 				return ctx.SendStatus(fiber.StatusOK)
 			}
-			taskRouter.Get(r, fn)
-			taskRouter.Post(r, fn)
+			taskRouter.Get(subroute, fn)
+			taskRouter.Post(subroute, fn)
 		}
 	}
 }
